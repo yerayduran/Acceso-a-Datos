@@ -39,38 +39,30 @@ public class GestorCoches {
                     case 1:
                         cargarInformacion();
                         break;
-
                     case 2:
                         insertarRegistro();
                         break;
-
                     case 3:
                         ordenarPorMatricula();
                         break;
-
                     case 4:
                         borrarRegistro();
                         break;
-
                     case 5:
                         modificarRegistro();
                         break;
-
                     case 6:
                         mostrarRegistros();
                         break;
-
                     case 0:
                         System.out.println("Saliendo del programa...");
                         break;
-
                     default:
                         System.out.println("Opción inválida.");
                 }
             } catch (IOException e) {
                 System.out.println("Error de entrada/salida: " + e.getMessage());
             }
-
         } while (opcion != 0);
     }
 
@@ -79,7 +71,7 @@ public class GestorCoches {
      */
     public static void mostrarMenu() {
         System.out.println();
-        System.out.println("===== BASE DE DATOS DE COCHES =====");
+        System.out.println("-------MENU PARA GESTIONAR COCHE------");
         System.out.println("1. Cargar información desde CSV");
         System.out.println("2. Insertar un coche");
         System.out.println("3. Ordenar por matrícula");
@@ -271,7 +263,7 @@ public class GestorCoches {
     /**
      * Permite modificar la marca y el modelo de un registro.
      *
-     * <p>La matrícula no se modifica porque es el campo clave del registro.</p>
+     * La matrícula no se modifica porque es el campo clave del registro.
      *
      * @throws IOException si se produce un error con el fichero
      */
@@ -328,9 +320,9 @@ public class GestorCoches {
         }
 
         System.out.println();
-        System.out.println("===== REGISTROS =====");
+        System.out.println("-----REGISTROS-----");
 
-        for (int i = 0; i < registros.size(); i++) {
+        for (int i = 1; i < registros.size(); i++) {
             String[] registro = registros.get(i);
             System.out.println(i + " - Matrícula: " + registro[0] + ", Marca: " + registro[1] + ", Modelo: " + registro[2]);
         }
@@ -355,14 +347,14 @@ public class GestorCoches {
             throw new IOException("El fichero no contiene registros completos.");
         }
 
-        try (RandomAccessFile raf = new RandomAccessFile(fichero, "r")) {
+        try (RandomAccessFile acessoArchivo = new RandomAccessFile(fichero, "r")) {
 
-            while (raf.getFilePointer() < raf.length()) {
-                String matricula = leerCampoFijo(raf, LONGITUD_MATRICULA);
+            while (acessoArchivo.getFilePointer() < acessoArchivo.length()) {
+                String matricula = leerCampoFijo(acessoArchivo, LONGITUD_MATRICULA);
 
-                String marca = leerCampoFijo(raf, LONGITUD_MARCA);
+                String marca = leerCampoFijo(acessoArchivo, LONGITUD_MARCA);
 
-                String modelo = leerCampoFijo(raf, LONGITUD_MODELO);
+                String modelo = leerCampoFijo(acessoArchivo, LONGITUD_MODELO);
 
                 registros.add(new String[]{matricula, marca, modelo});
             }
@@ -379,21 +371,17 @@ public class GestorCoches {
      */
     public static void guardarRegistros(List<String[]> registros) throws IOException {
 
-        try (RandomAccessFile raf = new RandomAccessFile(FICHERO_BINARIO, "rw")) {
+        try (RandomAccessFile acessoArchivo = new RandomAccessFile(FICHERO_BINARIO, "rw")) {
 
             // Se borra el contenido anterior para reconstruir el fichero.
-            raf.setLength(0);
+            acessoArchivo.setLength(0);
 
             for (String[] registro : registros) {
-                escribirCampoFijo(raf, registro[0], LONGITUD_MATRICULA);
+                escribirCampoFijo(acessoArchivo, registro[0], LONGITUD_MATRICULA);
 
-                escribirCampoFijo(raf, registro[1], LONGITUD_MARCA);
+                escribirCampoFijo(acessoArchivo, registro[1], LONGITUD_MARCA);
 
-                escribirCampoFijo(
-                        raf,
-                        registro[2],
-                        LONGITUD_MODELO
-                );
+                escribirCampoFijo(acessoArchivo, registro[2], LONGITUD_MODELO);
             }
         }
     }
@@ -401,26 +389,20 @@ public class GestorCoches {
     /**
      * Escribe una cadena con longitud fija.
      *
-     * <p>Si la cadena es menor que el tamaño indicado, se completa con
-     * espacios. Si es mayor, se lanza una excepción.</p>
+     * Si la cadena es menor que el tamaño indicado, se completa con
+     * espacios. Si es mayor, se lanza una excepción.
      *
-     * @param raf fichero de acceso aleatorio
+     * @param acessoArchivo fichero de acceso aleatorio
      * @param texto texto que se escribirá
      * @param longitud longitud fija del campo
      * @throws IOException si la cadena supera la longitud permitida
      */
-    public static void escribirCampoFijo(
-            RandomAccessFile raf,
-            String texto,
-            int longitud) throws IOException {
+    public static void escribirCampoFijo(RandomAccessFile acessoArchivo, String texto, int longitud) throws IOException {
 
         String valor = texto == null ? "" : texto;
 
         if (valor.length() > longitud) {
-            throw new IOException(
-                    "El campo supera la longitud máxima de "
-                            + longitud + " caracteres."
-            );
+            throw new IOException("El campo supera la longitud máxima de " + longitud + " caracteres.");
         }
 
         StringBuilder campo = new StringBuilder(valor);
@@ -429,29 +411,24 @@ public class GestorCoches {
             campo.append(' ');
         }
 
-        raf.write(campo.toString().getBytes(StandardCharsets.ISO_8859_1));
+        acessoArchivo.write(campo.toString().getBytes(StandardCharsets.UTF_8));
     }
 
     /**
      * Lee una cadena de tamaño fijo desde el fichero.
      *
-     * @param raf fichero de acceso aleatorio
+     * @param acessoArchivo fichero de acceso aleatorio
      * @param longitud número de bytes que se leerán
      * @return texto leído sin los espacios finales
      * @throws IOException si no se puede leer el campo completo
      */
-    public static String leerCampoFijo(
-            RandomAccessFile raf,
-            int longitud) throws IOException {
+    public static String leerCampoFijo(RandomAccessFile acessoArchivo, int longitud) throws IOException {
 
         byte[] datos = new byte[longitud];
 
-        raf.readFully(datos);
+        acessoArchivo.readFully(datos);
 
-        return new String(
-                datos,
-                StandardCharsets.ISO_8859_1
-        ).trim();
+        return new String(datos, StandardCharsets.UTF_8).trim();
     }
 
     /**
@@ -461,9 +438,7 @@ public class GestorCoches {
      * @param matricula matrícula que se desea buscar
      * @return posición del registro o -1 si no existe
      */
-    public static int buscarPorMatricula(
-            List<String[]> registros,
-            String matricula) {
+    public static int buscarPorMatricula(List<String[]> registros, String matricula) {
 
         for (int i = 0; i < registros.size(); i++) {
             if (registros.get(i)[0].equalsIgnoreCase(matricula)) {
@@ -481,9 +456,7 @@ public class GestorCoches {
      * @param posicion posición que se desea comprobar
      * @return true si la posición es válida
      */
-    public static boolean posicionValida(
-            List<String[]> registros,
-            int posicion) {
+    public static boolean posicionValida(List<String[]> registros, int posicion) {
 
         return posicion >= 0 && posicion < registros.size();
     }
@@ -496,10 +469,7 @@ public class GestorCoches {
      * @param modelo modelo del vehículo
      * @return true si todos los campos son válidos
      */
-    public static boolean registroValido(
-            String matricula,
-            String marca,
-            String modelo) {
+    public static boolean registroValido(String matricula, String marca, String modelo) {
 
         return matricula != null
                 && marca != null
@@ -518,20 +488,11 @@ public class GestorCoches {
      * @return array con matrícula, marca y modelo
      */
     public static String[] pedirDatosRegistro() {
-        String matricula = leerCampo(
-                "Introduce la matrícula: ",
-                LONGITUD_MATRICULA
-        );
+        String matricula = leerCampo("Introduce la matrícula: ", LONGITUD_MATRICULA);
 
-        String marca = leerCampo(
-                "Introduce la marca: ",
-                LONGITUD_MARCA
-        );
+        String marca = leerCampo("Introduce la marca: ", LONGITUD_MARCA);
 
-        String modelo = leerCampo(
-                "Introduce el modelo: ",
-                LONGITUD_MODELO
-        );
+        String modelo = leerCampo("Introduce el modelo: ", LONGITUD_MODELO);
 
         return new String[]{matricula, marca, modelo};
     }
@@ -543,9 +504,7 @@ public class GestorCoches {
      * @param longitudMaxima longitud máxima permitida
      * @return cadena introducida
      */
-    public static String leerCampo(
-            String mensaje,
-            int longitudMaxima) {
+    public static String leerCampo(String mensaje, int longitudMaxima) {
 
         String valor;
 
@@ -555,11 +514,7 @@ public class GestorCoches {
             if (valor.isBlank()) {
                 System.out.println("El campo no puede estar vacío.");
             } else if (valor.length() > longitudMaxima) {
-                System.out.println(
-                        "El campo no puede superar "
-                                + longitudMaxima
-                                + " caracteres."
-                );
+                System.out.println("El campo no puede superar " + longitudMaxima + " caracteres.");
             }
         } while (valor.isBlank() || valor.length() > longitudMaxima);
 
