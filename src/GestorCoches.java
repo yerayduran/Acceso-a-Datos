@@ -22,11 +22,9 @@ public class GestorCoches {
 
     private static final BufferedReader ENTRADA = new BufferedReader(new InputStreamReader(System.in));
 
-    /**
-     * Método principal del programa.
-     *
-     * @param args argumentos recibidos desde la línea de comandos
-     */
+
+
+
     public static void main(String[] args) {
         int opcion;
 
@@ -55,10 +53,10 @@ public class GestorCoches {
                         mostrarRegistros();
                         break;
                     case 0:
-                        System.out.println("Saliendo del programa...");
+                        System.out.println("Adios joven amo...");
                         break;
                     default:
-                        System.out.println("Opción inválida.");
+                        System.out.println("Elije otra opcion.");
                 }
             } catch (IOException e) {
                 System.out.println("Error de entrada/salida: " + e.getMessage());
@@ -66,10 +64,12 @@ public class GestorCoches {
         } while (opcion != 0);
     }
 
-    /**
-     * Muestra las opciones disponibles del menú.
-     */
-    public static void mostrarMenu() {
+
+
+
+
+
+    private static void mostrarMenu() {
         System.out.println();
         System.out.println("-------MENU PARA GESTIONAR COCHE------");
         System.out.println("1. Cargar información desde CSV");
@@ -81,6 +81,12 @@ public class GestorCoches {
         System.out.println("0. Salir");
     }
 
+
+
+
+
+
+
     /**
      * Carga los registros del fichero CSV en el fichero binario.
      *
@@ -90,7 +96,7 @@ public class GestorCoches {
      *
      * @throws IOException si se produce un error al leer o escribir
      */
-    public static void cargarInformacion() throws IOException {
+    private static void cargarInformacion() throws IOException {
         File fichero = new File(FICHERO_CSV);
 
         if (!fichero.exists()) {
@@ -146,12 +152,16 @@ public class GestorCoches {
         System.out.println("Registros cargados: " + registros.size());
     }
 
+
+
+
+
     /**
-     * Inserta un nuevo registro en una posición determinada.
+     * Inserta un nuevo registro en una posición que tu quieras.
      *
      * @throws IOException si se produce un error con el fichero
      */
-    public static void insertarRegistro() throws IOException {
+    private static void insertarRegistro() throws IOException {
         List<String[]> registros = leerRegistros();
 
         int posicion = leerEntero("Introduce la posición de inserción: ");
@@ -174,12 +184,16 @@ public class GestorCoches {
         System.out.println("Registro insertado correctamente.");
     }
 
+
+
+
+
     /**
-     * Ordena todos los registros alfabéticamente por matrícula.
+     * Ordena todos los registros alfabéticamente por matrícula con el flujo sort.
      *
      * @throws IOException si se produce un error con el fichero
      */
-    public static void ordenarPorMatricula() throws IOException {
+    private static void ordenarPorMatricula() throws IOException {
         List<String[]> registros = leerRegistros();
 
         registros.sort(Comparator.comparing(registro -> registro[0]));
@@ -189,12 +203,16 @@ public class GestorCoches {
         System.out.println("Registros ordenados por matrícula.");
     }
 
+
+
+
+
     /**
-     * Permite elegir si se desea borrar por matrícula o por posición.
+     * Permite elegir si quieres borrar por matrícula o por posición.
      *
      * @throws IOException si se produce un error con el fichero
      */
-    public static void borrarRegistro() throws IOException {
+    private static void borrarRegistro() throws IOException {
         System.out.println();
         System.out.println("1. Borrar por matrícula");
         System.out.println("2. Borrar por posición");
@@ -207,11 +225,9 @@ public class GestorCoches {
             case 1:
                 borrarPorMatricula(registros);
                 break;
-
             case 2:
                 borrarPorPosicion(registros);
                 break;
-
             default:
                 System.out.println("Opción inválida.");
         }
@@ -223,7 +239,7 @@ public class GestorCoches {
      * @param registros lista de registros
      * @throws IOException si se produce un error al guardar
      */
-    public static void borrarPorMatricula(List<String[]> registros) throws IOException {
+    private static void borrarPorMatricula(List<String[]> registros) throws IOException {
 
         String matricula = leerCadena("Introduce la matrícula: ");
         int indice = buscarPorMatricula(registros, matricula);
@@ -239,13 +255,18 @@ public class GestorCoches {
         System.out.println("Registro borrado correctamente.");
     }
 
+
+
+
+
+
     /**
      * Borra un registro utilizando su posición.
      *
      * @param registros lista de registros
      * @throws IOException si se produce un error al guardar
      */
-    public static void borrarPorPosicion(List<String[]> registros) throws IOException {
+    private static void borrarPorPosicion(List<String[]> registros) throws IOException {
 
         int posicion = leerEntero("Introduce la posición: ");
 
@@ -260,6 +281,10 @@ public class GestorCoches {
         System.out.println("Registro borrado correctamente.");
     }
 
+
+
+
+
     /**
      * Permite modificar la marca y el modelo de un registro.
      *
@@ -267,7 +292,7 @@ public class GestorCoches {
      *
      * @throws IOException si se produce un error con el fichero
      */
-    public static void modificarRegistro() throws IOException {
+    private static void modificarRegistro() throws IOException {
         List<String[]> registros = leerRegistros();
 
         System.out.println();
@@ -307,12 +332,19 @@ public class GestorCoches {
         System.out.println("Registro modificado correctamente.");
     }
 
+
+
+
+
+
     /**
      * Muestra todos los registros y su posición.
      *
      * @throws IOException si se produce un error al leer
      */
-    public static void mostrarRegistros() throws IOException {List<String[]> registros = leerRegistros();
+    private static void mostrarRegistros() throws IOException {
+
+        List<String[]> registros = leerRegistros();
 
         if (registros.isEmpty()) {
             System.out.println("No hay registros.");
@@ -322,11 +354,16 @@ public class GestorCoches {
         System.out.println();
         System.out.println("-----REGISTROS-----");
 
-        for (int i = 1; i < registros.size(); i++) {
+        for (int i = 0; i < registros.size(); i++) {
             String[] registro = registros.get(i);
             System.out.println(i + " - Matrícula: " + registro[0] + ", Marca: " + registro[1] + ", Modelo: " + registro[2]);
         }
     }
+
+
+
+
+
 
     /**
      * Lee todos los registros almacenados en el fichero binario.
@@ -334,7 +371,7 @@ public class GestorCoches {
      * @return lista de registros, donde cada registro es un array de tres posiciones: matrícula, marca y modelo
      * @throws IOException si se produce un error de lectura
      */
-    public static List<String[]> leerRegistros() throws IOException {
+    private static List<String[]> leerRegistros() throws IOException {
         List<String[]> registros = new ArrayList<>();
 
         File fichero = new File(FICHERO_BINARIO);
@@ -363,13 +400,18 @@ public class GestorCoches {
         return registros;
     }
 
+
+
+
+
+
     /**
      * Guarda todos los registros sobrescribiendo el fichero binario.
      *
      * @param registros lista de registros que se guardará
      * @throws IOException si se produce un error de escritura
      */
-    public static void guardarRegistros(List<String[]> registros) throws IOException {
+    private static void guardarRegistros(List<String[]> registros) throws IOException {
 
         try (RandomAccessFile acessoArchivo = new RandomAccessFile(FICHERO_BINARIO, "rw")) {
 
@@ -386,10 +428,15 @@ public class GestorCoches {
         }
     }
 
+
+
+
+
+
     /**
      * Escribe una cadena con longitud fija.
      *
-     * Si la cadena es menor que el tamaño indicado, se completa con
+     * Si la cadena es menor que el tamaño indicado en los atributos anteriormente mencionados, se completa con
      * espacios. Si es mayor, se lanza una excepción.
      *
      * @param acessoArchivo fichero de acceso aleatorio
@@ -397,7 +444,7 @@ public class GestorCoches {
      * @param longitud longitud fija del campo
      * @throws IOException si la cadena supera la longitud permitida
      */
-    public static void escribirCampoFijo(RandomAccessFile acessoArchivo, String texto, int longitud) throws IOException {
+    private static void escribirCampoFijo(RandomAccessFile acessoArchivo, String texto, int longitud) throws IOException {
 
         String valor = texto == null ? "" : texto;
 
@@ -414,6 +461,9 @@ public class GestorCoches {
         acessoArchivo.write(campo.toString().getBytes(StandardCharsets.UTF_8));
     }
 
+
+
+
     /**
      * Lee una cadena de tamaño fijo desde el fichero.
      *
@@ -422,7 +472,7 @@ public class GestorCoches {
      * @return texto leído sin los espacios finales
      * @throws IOException si no se puede leer el campo completo
      */
-    public static String leerCampoFijo(RandomAccessFile acessoArchivo, int longitud) throws IOException {
+    private static String leerCampoFijo(RandomAccessFile acessoArchivo, int longitud) throws IOException {
 
         byte[] datos = new byte[longitud];
 
@@ -431,6 +481,10 @@ public class GestorCoches {
         return new String(datos, StandardCharsets.UTF_8).trim();
     }
 
+
+
+
+
     /**
      * Busca un registro por matrícula.
      *
@@ -438,7 +492,7 @@ public class GestorCoches {
      * @param matricula matrícula que se desea buscar
      * @return posición del registro o -1 si no existe
      */
-    public static int buscarPorMatricula(List<String[]> registros, String matricula) {
+    private static int buscarPorMatricula(List<String[]> registros, String matricula) {
 
         for (int i = 0; i < registros.size(); i++) {
             if (registros.get(i)[0].equalsIgnoreCase(matricula)) {
@@ -449,6 +503,9 @@ public class GestorCoches {
         return -1;
     }
 
+
+
+
     /**
      * Comprueba si una posición pertenece a la lista.
      *
@@ -456,10 +513,13 @@ public class GestorCoches {
      * @param posicion posición que se desea comprobar
      * @return true si la posición es válida
      */
-    public static boolean posicionValida(List<String[]> registros, int posicion) {
+    private static boolean posicionValida(List<String[]> registros, int posicion) {
 
         return posicion >= 0 && posicion < registros.size();
     }
+
+
+
 
     /**
      * Comprueba que los campos de un registro sean válidos.
@@ -469,7 +529,7 @@ public class GestorCoches {
      * @param modelo modelo del vehículo
      * @return true si todos los campos son válidos
      */
-    public static boolean registroValido(String matricula, String marca, String modelo) {
+    private static boolean registroValido(String matricula, String marca, String modelo) {
 
         return matricula != null
                 && marca != null
@@ -482,12 +542,15 @@ public class GestorCoches {
                 && modelo.length() <= LONGITUD_MODELO;
     }
 
+
+
+
     /**
      * Solicita al usuario los datos completos de un nuevo registro.
      *
      * @return array con matrícula, marca y modelo
      */
-    public static String[] pedirDatosRegistro() {
+    private static String[] pedirDatosRegistro() {
         String matricula = leerCampo("Introduce la matrícula: ", LONGITUD_MATRICULA);
 
         String marca = leerCampo("Introduce la marca: ", LONGITUD_MARCA);
@@ -497,6 +560,9 @@ public class GestorCoches {
         return new String[]{matricula, marca, modelo};
     }
 
+
+
+
     /**
      * Solicita una cadena al usuario comprobando su longitud.
      *
@@ -504,7 +570,7 @@ public class GestorCoches {
      * @param longitudMaxima longitud máxima permitida
      * @return cadena introducida
      */
-    public static String leerCampo(String mensaje, int longitudMaxima) {
+    private static String leerCampo(String mensaje, int longitudMaxima) {
 
         String valor;
 
@@ -521,13 +587,16 @@ public class GestorCoches {
         return valor;
     }
 
+
+
+
     /**
      * Lee un número entero controlando el formato introducido.
      *
      * @param mensaje mensaje mostrado al usuario
      * @return número entero introducido
      */
-    public static int leerEntero(String mensaje) {
+    private static int leerEntero(String mensaje) {
         while (true) {
             try {
                 System.out.print(mensaje);
@@ -541,13 +610,16 @@ public class GestorCoches {
         }
     }
 
+
+
+
     /**
      * Lee una cadena desde la entrada estándar.
      *
      * @param mensaje mensaje mostrado al usuario
      * @return texto introducido
      */
-    public static String leerCadena(String mensaje) {
+    private static String leerCadena(String mensaje) {
         while (true) {
             try {
                 System.out.print(mensaje);
