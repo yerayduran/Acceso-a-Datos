@@ -12,7 +12,7 @@ import java.util.List;
 public class GestorCoches {
 
     private static final String FICHERO_CSV = "BBDD Coches.csv";
-    private static final String FICHERO_BINARIO = "fichero.txt";
+    private static final String FICHERO_BINARIO = "fichero.dat";
 
     private static final int LONGITUD_MATRICULA = 7;
     private static final int LONGITUD_MARCA = 32;
@@ -59,7 +59,7 @@ public class GestorCoches {
                         System.out.println("Elije otra opcion.");
                 }
             } catch (IOException e) {
-                System.out.println("Error de entrada/salida: " + e.getMessage());
+                System.out.println("Error al introducir o devolver información: " + e.getMessage());
             }
         } while (opcion != 0);
     }
@@ -124,7 +124,7 @@ public class GestorCoches {
                 String[] campos = linea.split(",", -1);
 
                 if (campos.length < 3) {
-                    System.out.println("Línea ignorada por formato incorrecto: " + linea);
+                    System.out.println("Línea ignorada por tener un formato incorrecto: " + linea);
                     continue;
                 }
 
@@ -167,14 +167,14 @@ public class GestorCoches {
         int posicion = leerEntero("Introduce la posición de inserción: ");
 
         if (posicion < 0 || posicion > registros.size()) {
-            System.out.println("Posición inválida.");
+            System.out.println("Posición no válido.");
             return;
         }
 
         String[] nuevoRegistro = pedirDatosRegistro();
 
         if (buscarPorMatricula(registros, nuevoRegistro[0]) != -1) {
-            System.out.println("Ya existe un registro con esa matrícula.");
+            System.out.println("Ya existe un registro con esa matrícula en el fichero.");
             return;
         }
 
@@ -245,14 +245,14 @@ public class GestorCoches {
         int indice = buscarPorMatricula(registros, matricula);
 
         if (indice == -1) {
-            System.out.println("No existe esa matrícula.");
+            System.out.println("No existe dicha matrícula.");
             return;
         }
 
         registros.remove(indice);
         guardarRegistros(registros);
 
-        System.out.println("Registro borrado correctamente.");
+        System.out.println("Registro borrado de manera correcta.");
     }
 
 
@@ -311,7 +311,7 @@ public class GestorCoches {
 
             indice = posicionValida(registros, posicion) ? posicion : -1;
         } else {
-            System.out.println("Opción inválida.");
+            System.out.println("Opción no valida.");
             return;
         }
 
@@ -329,7 +329,7 @@ public class GestorCoches {
 
         guardarRegistros(registros);
 
-        System.out.println("Registro modificado correctamente.");
+        System.out.println("Registro modificado de manera correcto.");
     }
 
 
@@ -415,8 +415,7 @@ public class GestorCoches {
 
         try (RandomAccessFile acessoArchivo = new RandomAccessFile(FICHERO_BINARIO, "rw")) {
 
-            // Se borra el contenido anterior para reconstruir el fichero.
-            acessoArchivo.setLength(0);
+            acessoArchivo.setLength(0); //Aqui se borra el registro anterior para reconstruir el fichero
 
             for (String[] registro : registros) {
                 escribirCampoFijo(acessoArchivo, registro[0], LONGITUD_MATRICULA);
