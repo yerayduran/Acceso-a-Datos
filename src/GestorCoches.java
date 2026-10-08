@@ -164,11 +164,7 @@ public class GestorCoches {
     private static void insertarRegistro() throws IOException {
         List<String[]> registros = leerRegistros();
 
-        int posicionUsuario = leerEntero(
-                "Introduce la posición de inserción (1-"
-                        + (registros.size() + 1)
-                        + "): "
-        );
+        int posicionUsuario = leerEntero("Introduce la posición de inserción (1-" + (registros.size() + 1) + "): ");
 
         if (posicionUsuario < 1 || posicionUsuario > registros.size() + 1) {
             System.out.println("Posición no válida. Debe estar entre 1 y " + (registros.size() + 1) + ".");
@@ -524,21 +520,6 @@ public class GestorCoches {
         }
 
         return -1;
-    }
-
-
-
-
-    /**
-     * Comprueba si una posición pertenece a la lista.
-     *
-     * @param registros lista de registros
-     * @param posicion posición que se desea comprobar
-     * @return true si la posición es válida
-     */
-    private static boolean posicionValida(List<String[]> registros, int posicion) {
-
-        return posicion >= 0 && posicion < registros.size();
     }
 
 
