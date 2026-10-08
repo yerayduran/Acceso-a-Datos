@@ -164,10 +164,14 @@ public class GestorCoches {
     private static void insertarRegistro() throws IOException {
         List<String[]> registros = leerRegistros();
 
-        int posicion = leerEntero("Introduce la posición de inserción: ");
+        int posicionUsuario = leerEntero(
+                "Introduce la posición de inserción (1-"
+                        + (registros.size() + 1)
+                        + "): "
+        );
 
-        if (posicion < 0 || posicion > registros.size()) {
-            System.out.println("Posición no válido.");
+        if (posicionUsuario < 1 || posicionUsuario > registros.size() + 1) {
+            System.out.println("Posición no válida. Debe estar entre 1 y " + (registros.size() + 1) + ".");
             return;
         }
 
@@ -178,10 +182,12 @@ public class GestorCoches {
             return;
         }
 
-        registros.add(posicion, nuevoRegistro);
+        int indiceInterno = posicionUsuario - 1;
+
+        registros.add(indiceInterno, nuevoRegistro);
         guardarRegistros(registros);
 
-        System.out.println("Registro insertado correctamente.");
+        System.out.println("Registro insertado correctamente en la posición " + posicionUsuario + ".");
     }
 
 
@@ -268,17 +274,20 @@ public class GestorCoches {
      */
     private static void borrarPorPosicion(List<String[]> registros) throws IOException {
 
-        int posicion = leerEntero("Introduce la posición: ");
+        int posicionUsuario = leerEntero("Introduce la posición: ");
 
-        if (posicion < 0 || posicion >= registros.size()) {
+        if (posicionUsuario < 1 || posicionUsuario > registros.size()) {
+
             System.out.println("Posición inválida.");
             return;
         }
 
-        registros.remove(posicion);
+        int indiceInterno = posicionUsuario - 1;
+
+        registros.remove(indiceInterno);
         guardarRegistros(registros);
 
-        System.out.println("Registro borrado correctamente.");
+        System.out.println("Registro " + posicionUsuario + " borrado correctamente.");
     }
 
 
@@ -306,11 +315,21 @@ public class GestorCoches {
             String matricula = leerCadena("Introduce la matrícula: ");
 
             indice = buscarPorMatricula(registros, matricula);
-        } else if (opcion == 2) {
-            int posicion = leerEntero("Introduce la posición: ");
 
-            indice = posicionValida(registros, posicion) ? posicion : -1;
-        } else {
+        } else if (opcion == 2) {
+
+            int posicionUsuario = leerEntero("Introduce la posición: ");
+
+            if (posicionUsuario >= 1 && posicionUsuario <= registros.size()) {
+
+                indice = posicionUsuario - 1;
+
+            } else {
+
+                indice = -1;
+
+            }
+        }else {
             System.out.println("Opción no valida.");
             return;
         }
@@ -356,7 +375,12 @@ public class GestorCoches {
 
         for (int i = 0; i < registros.size(); i++) {
             String[] registro = registros.get(i);
-            System.out.println(i + " - Matrícula: " + registro[0] + ", Marca: " + registro[1] + ", Modelo: " + registro[2]);
+
+            System.out.println((i + 1)
+                            + " - Matrícula: " + registro[0]
+                            + ", Marca: " + registro[1]
+                            + ", Modelo: " + registro[2]
+            );
         }
     }
 
