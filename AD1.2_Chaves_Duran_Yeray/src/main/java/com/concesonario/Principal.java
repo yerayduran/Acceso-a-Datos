@@ -1,48 +1,37 @@
 package com.concesonario;
 
-import java.io.IOException;
+import com.concesonario.model.Coche;
+import com.concesonario.model.Concesionario;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
+
+import java.io.File;
 
 public class Principal {
 
     static void main(String[] args) {
-        int opcion;
+        Concesionario concesionario = new Concesionario();
 
-        do {
-            mostrarMenu();
-            opcion = leerEntero("Elige una opción: ");
+        Coche coche = new Coche("2444vvv", "ljkhdwhig", "jcdhs");
+        concesionario.getCoches().add(coche);
 
-            try {
-                switch (opcion) {
-                    case 1:
-                        cargarInformacion();
-                        break;
-                    case 2:
-                        insertarRegistro();
-                        break;
-                    case 3:
-                        ordenarPorMatricula();
-                        break;
-                    case 4:
-                        borrarPorMatricula(registros);
-                        break;
-                    case 5:
-                        modificarRegistro();
-                        break;
-                    case 6:
-                        mostrarRegistros();
-                        break;
-                    case 0:
-                        System.out.println("Adios joven amo...");
-                        break;
-                    default:
-                        System.out.println("Elije otra opcion.");
-                }
-            } catch (IOException e) {
-                System.out.println("Error al introducir o devolver información: " + e.getMessage());
-            }
-        } while (opcion != 0);
+
+
+
+        try {
+            JAXBContext context = JAXBContext.newInstance(Concesionario.class);
+            Unmarshaller unmarshaller = context.createUnmarshaller();
+
+            File archivoXML = new File("src/main/java/com/concesonario/concesionario_plantilla.xml");
+
+            Concesionario concesionarioAXML = (Concesionario) unmarshaller.unmarshal(archivoXML);
+
+            System.out.println("Concesionario cargado: " + concesionarioAXML.getCoches());
+        }catch (JAXBException e){
+            e.printStackTrace();
+        }
+
+
     }
-
-
 }
-
