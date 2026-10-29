@@ -32,8 +32,7 @@ public class GestorImportarJson {
             throw new DBException("El fichero JSON no existe o está vacío: " + rutaJSON);
         }
 
-        JsonbConfig config = new JsonbConfig()
-                .withFormatting(true);
+        JsonbConfig config = new JsonbConfig().withFormatting(true);
 
         try (Jsonb jsonb = JsonbBuilder.create(config);
              InputStream input = new FileInputStream(fichero)) {
