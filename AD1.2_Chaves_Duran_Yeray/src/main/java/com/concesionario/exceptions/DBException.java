@@ -1,4 +1,4 @@
-package com.concesonario.exceptions;
+package com.concesionario.exceptions;
 
 public class DBException extends Exception {
     public DBException(String message) {

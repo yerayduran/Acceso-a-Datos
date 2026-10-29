@@ -1,9 +1,7 @@
-    package com.concesonario.utils;
+    package com.concesionario.utils;
 
-import exceptions.MiEntrdaSalidaException;
+import com.concesionario.exceptions.MiEntradaSalidaException;
 
-
-import java.text.CollationElementIterator;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.util.Collection;
@@ -181,10 +179,10 @@ public class MiEntradaSalida {
      * @param max     valor máximo incluido
      * @return Numero leido por teclado
      */
-    public static int leerEnteroRango(String mensaje, int min, int max) throws MiEntrdaSalidaException {
+    public static int leerEnteroRango(String mensaje, int min, int max) throws MiEntradaSalidaException {
         if (min > max) {
             //Mostrar error
-            throw new MiEntrdaSalidaException("El mínimo es mayor que el máximo");
+            throw new MiEntradaSalidaException("El mínimo es mayor que el máximo");
         }
         int a;
         do {
@@ -287,21 +285,21 @@ public class MiEntradaSalida {
         System.out.println();
     }
 
-    public static LocalDate fecha(String mensaje) throws MiEntrdaSalidaException {
+    public static LocalDate fecha(String mensaje) throws MiEntradaSalidaException {
         int año =  leerEnteroPositivo("Introduce el año: ",true);
         int mes =  leerEnteroPositivo("Introduce el mes: ",true);
         int dia =  leerEnteroPositivo("Introduce el dia: ",true);
         try {
             return LocalDate.of(año,mes,dia);
         }catch (DateTimeException e){
-            throw new MiEntrdaSalidaException("Fecha no valida.");
+            throw new MiEntradaSalidaException("Fecha no valida.");
         }
 
     }
 
-    public static char leerChar(String mensaje) throws MiEntrdaSalidaException{
+    public static char leerChar(String mensaje) throws MiEntradaSalidaException{
         String texto = leerTexto(mensaje);
-        if (texto.length() != 1) {throw new MiEntrdaSalidaException("Debes introducir un caracter.");}
+        if (texto.length() != 1) {throw new MiEntradaSalidaException("Debes introducir un caracter.");}
         return texto.charAt(0);
     }
 
