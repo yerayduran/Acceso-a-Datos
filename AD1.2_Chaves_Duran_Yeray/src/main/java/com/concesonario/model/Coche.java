@@ -84,4 +84,11 @@ public class Coche implements Comparable<Coche> {
     public int compareTo(Coche otroCoche) {
         return this.matricula.compareTo(otroCoche.matricula);
     }
+
+    public void añadirExtra(String extra) {
+        if (this.equipamiento == null) {
+            this.equipamiento = new ArrayList<>();
+        }
+        this.equipamiento.add(extra);
+    }
 }
