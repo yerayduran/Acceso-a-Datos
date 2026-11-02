@@ -17,7 +17,7 @@ public class PropertiesReader {
             "config.properties"
     );
 
-    private final Properties p;
+    private static Properties p;
     private static PropertiesReader instance = null;
 
     private PropertiesReader() throws AppException {
@@ -27,7 +27,8 @@ public class PropertiesReader {
         try (BufferedReader lector = Files.newBufferedReader(configFile, StandardCharsets.UTF_8)) {
             p.load(lector);
         } catch (IOException e) {
-            throw new AppException("❌ ERROR: No se ha podido leer el archivo config.properties en la ruta: " + configFile.toAbsolutePath());
+            throw new AppException("No se ha podido leer config.properties: " + configFile.toAbsolutePath()
+                    + " (" + e.getMessage() + ")");
         }
     }
 
@@ -41,6 +42,12 @@ public class PropertiesReader {
         throw new AppException("❌ ERROR: El archivo config.properties no se encuentra en ninguna de las rutas esperadas: " + CONFIG_CANDIDATES);
     }
 
+    /**
+     * Devuelve la instancia que contiene las propiedades de configuración.
+     *
+     * @return lector de configuración
+     * @throws AppException si no se puede cargar el fichero de configuración
+     */
     public static PropertiesReader getInstance() throws AppException {
         if (instance == null) {
             instance = new PropertiesReader();
@@ -48,7 +55,13 @@ public class PropertiesReader {
         return instance;
     }
 
-    public String get(String propiedad) {
+    /**
+     * Obtiene el valor asociado a una propiedad.
+     *
+     * @param propiedad nombre de la propiedad
+     * @return valor configurado, o {@code null} si no existe
+     */
+    public static String get(String propiedad) {
         return p.getProperty(propiedad);
     }
 }
