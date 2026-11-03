@@ -12,14 +12,14 @@ import java.util.List;
  * Clase encargada de generar un informe de texto con los datos del concesionario.
  * El archivo se guarda en la ruta configurada en ->> [informe_concesionario]
  */
-public class GeneradorInforme {
+public class InformesServices {
 
     private final String rutaInforme;
 
     /**
      * Constructor que obtiene la ruta del informe desde el archivo de configuración.
      */
-    public GeneradorInforme() {
+    public InformesServices() {
         this.rutaInforme = PropertiesReader.get("informe_concesionario");
     }
 

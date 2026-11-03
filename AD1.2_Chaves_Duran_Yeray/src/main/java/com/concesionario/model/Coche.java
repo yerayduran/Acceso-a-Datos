@@ -1,5 +1,8 @@
 package com.concesionario.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlAttribute;
@@ -12,11 +15,14 @@ import java.util.List;
 
 @XmlRootElement(name = "coche")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Coche implements Comparable<Coche>{
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class Coche implements Comparable<Coche> {
 
     @XmlAttribute(name = "id")
     private int id;
 
+    @JsonProperty("matricula-coche")
     @XmlElement(name = "matricula-coche")
     private String matricula;
 
@@ -26,6 +32,7 @@ public class Coche implements Comparable<Coche>{
     @XmlElement(name = "modelo")
     private String modelo;
 
+    @JsonProperty("extras")
     @XmlElementWrapper(name = "equipamiento")
     @XmlElement(name = "extra")
     private List<String> equipamiento;
@@ -39,10 +46,6 @@ public class Coche implements Comparable<Coche>{
 
     /**
      * Crea un coche sin equipamiento.
-     *
-     * @param matricula matrícula del coche
-     * @param marca marca del coche
-     * @param modelo modelo del coche
      */
     public Coche(String matricula, String marca, String modelo) {
         this();
@@ -53,82 +56,62 @@ public class Coche implements Comparable<Coche>{
 
     /**
      * Crea un coche con su equipamiento.
-     *
-     * @param matricula matrícula del coche
-     * @param marca marca del coche
-     * @param modelo modelo del coche
-     * @param equipamiento extras del coche
      */
     public Coche(String matricula, String marca, String modelo, List<String> equipamiento) {
         this(matricula, marca, modelo);
         this.equipamiento = equipamiento == null ? new ArrayList<>() : new ArrayList<>(equipamiento);
     }
 
-    /** @return identificador numérico del registro */
     public int getId() {
         return id;
     }
 
-    /** @param id identificador numérico del registro */
     public void setId(int id) {
         this.id = id;
     }
 
-    /** @return matrícula del coche */
     public String getMatricula() {
         return matricula;
     }
 
-    /** @param matricula matrícula del coche */
     public void setMatricula(String matricula) {
         this.matricula = matricula;
     }
 
-    /** @return marca del coche */
     public String getMarca() {
         return marca;
     }
 
-    /** @param marca marca del coche */
     public void setMarca(String marca) {
         this.marca = marca;
     }
 
-    /** @return modelo del coche */
     public String getModelo() {
         return modelo;
     }
 
-    /** @param modelo modelo del coche */
     public void setModelo(String modelo) {
         this.modelo = modelo;
     }
 
-    /** @return lista de extras del coche */
     public List<String> getEquipamiento() {
         return equipamiento == null ? new ArrayList<>() : equipamiento;
     }
 
-    /** @param equipamiento lista de extras del coche */
     public void setEquipamiento(List<String> equipamiento) {
         this.equipamiento = equipamiento == null ? new ArrayList<>() : equipamiento;
     }
 
-    /**
-     * Añade un extra no vacío al equipamiento.
-     *
-     * @param extra extra que se añade
-     */
     public void añadirExtra(String extra) {
         if (this.equipamiento == null) {
             this.equipamiento = new ArrayList<>();
         }
+
         if (extra != null && !extra.isBlank()) {
             this.equipamiento.add(extra.trim());
         }
     }
 
-    /** @return representación legible del coche */
     @Override
     public String toString() {
         return "Coche{" +
@@ -142,6 +125,9 @@ public class Coche implements Comparable<Coche>{
 
     @Override
     public int compareTo(Coche otroCoche) {
+        if (this.matricula == null && otroCoche.matricula == null) return 0;
+        if (this.matricula == null) return -1;
+        if (otroCoche.matricula == null) return 1;
         return this.matricula.compareTo(otroCoche.matricula);
     }
 }

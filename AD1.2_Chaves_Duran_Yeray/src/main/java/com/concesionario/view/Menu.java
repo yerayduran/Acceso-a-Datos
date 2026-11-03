@@ -5,29 +5,26 @@ import com.concesionario.exceptions.DBException;
 import com.concesionario.exceptions.MiEntradaSalidaException;
 import com.concesionario.model.Coche;
 import com.concesionario.model.Concesionario;
-import com.concesionario.services.GeneradorInforme;
-import com.concesionario.services.GestorCSV;
-import com.concesionario.services.GestorJSON;
-import com.concesionario.services.GestorXML;
+import com.concesionario.services.*;
 import com.concesionario.utils.MiEntradaSalida;
 import com.concesionario.utils.PropertiesReader;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.io.File;
-import java.io.IOException;
 
 public class Menu {
-    private final GestorXML gestorXML;
-    private final GestorCSV gestorCSV;
-    private final GestorJSON gestorJSON;
-    private final GeneradorInforme generadorInforme;
+
+    private final XMLService XMLService;
+    private final CSVService CSVService;
+    private final JSONService JSONService;
+    private final InformesServices informesServices;
+    private final ImportacionDeJSONService importacionDeJSONService;
 
     public Menu() throws AppException {
         PropertiesReader.getInstance();
-        gestorXML = new GestorXML();
-        gestorCSV = new GestorCSV();
-        gestorJSON = new GestorJSON();
-        generadorInforme = new GeneradorInforme();
+
+        XMLService = new XMLService();
+        CSVService = new CSVService();
+        JSONService = new JSONService();
+        informesServices = new InformesServices();
+        importacionDeJSONService = new ImportacionDeJSONService();
     }
 
     public static void main(String[] args) {
@@ -39,11 +36,20 @@ public class Menu {
     }
 
     public void iniciar() {
+        try {
+            // Aseguramos que la BBDD XML exista al arrancar la app
+            XMLService.comprobarFicheroOriginalBb();
+        } catch (DBException e) {
+            System.err.println("Advertencia al comprobar la BBDD inicial: " + e.getMessage());
+        }
+
         boolean continuar = true;
 
         while (continuar) {
             mostrarOpciones();
+
             int opcion;
+
             try {
                 opcion = MiEntradaSalida.leerEnteroRango("Elige una opción: ", 0, 12);
             } catch (MiEntradaSalidaException e) {
@@ -67,7 +73,7 @@ public class Menu {
                     case 12 -> generarInforme();
                     case 0 -> {
                         continuar = false;
-                        System.out.println("Hasta pronto.");
+                        System.out.println("Hasta la vista baby.");
                     }
                     default -> System.out.println("Opción no válida.");
                 }
@@ -94,17 +100,18 @@ public class Menu {
                 11. Importar un coche desde JSON
                 12. Generar informe
                 0. Salir
-                ======================================
                 """);
     }
 
     private Concesionario cargarConcesionario() throws DBException {
-        Concesionario concesionario = gestorXML.leerBaseDeDatos();
+        Concesionario concesionario = XMLService.leerBaseDeDatos();
+
         return concesionario == null ? new Concesionario() : concesionario;
     }
 
     private void mostrarCoches() throws DBException {
         Concesionario concesionario = cargarConcesionario();
+
         if (concesionario.getCoches().isEmpty()) {
             System.out.println("No hay coches registrados.");
             return;
@@ -117,7 +124,9 @@ public class Menu {
 
     private void buscarCoche() throws DBException {
         String matricula = MiEntradaSalida.leerLinea("Matrícula: ").trim();
+
         Coche coche = cargarConcesionario().buscarPorMatricula(matricula);
+
         if (coche == null) {
             System.out.println("No se encontró ningún coche con esa matrícula.");
         } else {
@@ -127,7 +136,9 @@ public class Menu {
 
     private void agregarCoche() throws DBException {
         Concesionario concesionario = cargarConcesionario();
+
         String matricula = MiEntradaSalida.leerLinea("Matrícula: ").trim();
+
         if (concesionario.buscarPorMatricula(matricula) != null) {
             System.out.println("Ya existe un coche con esa matrícula.");
             return;
@@ -135,10 +146,12 @@ public class Menu {
 
         String marca = MiEntradaSalida.leerLinea("Marca: ").trim();
         String modelo = MiEntradaSalida.leerLinea("Modelo: ").trim();
+
         Coche coche = new Coche(matricula, marca, modelo);
 
         while (confirmar("¿Añadir un extra? (S/N): ")) {
             String extra = MiEntradaSalida.leerLinea("Extra: ").trim();
+
             if (!extra.isEmpty()) {
                 coche.añadirExtra(extra);
             } else {
@@ -147,28 +160,36 @@ public class Menu {
         }
 
         concesionario.agregarCoche(coche);
-        gestorXML.guardarBaseDeDatos(concesionario);
+        XMLService.guardarBaseDeDatos(concesionario);
+
         System.out.println("Coche añadido correctamente.");
     }
 
     private boolean confirmar(String mensaje) {
         while (true) {
             String respuesta = MiEntradaSalida.leerLinea(mensaje).trim();
+
             if (respuesta.equalsIgnoreCase("S")) {
                 return true;
             }
+
             if (respuesta.equalsIgnoreCase("N")) {
                 return false;
             }
+
             System.out.println("Respuesta no válida. Introduce S o N.");
         }
     }
 
     private void eliminarCoche() throws DBException {
         Concesionario concesionario = cargarConcesionario();
-        String matricula = MiEntradaSalida.leerLinea("Matrícula del coche que quieres eliminar: ").trim();
+
+        String matricula = MiEntradaSalida.leerLinea(
+                "Matrícula del coche que quieres eliminar: "
+        ).trim();
+
         if (concesionario.eliminarPorMatricula(matricula)) {
-            gestorXML.guardarBaseDeDatos(concesionario);
+            XMLService.guardarBaseDeDatos(concesionario);
             System.out.println("Coche eliminado correctamente.");
         } else {
             System.out.println("No se encontró ningún coche con esa matrícula.");
@@ -177,78 +198,56 @@ public class Menu {
 
     private void ordenarCoches() throws DBException {
         Concesionario concesionario = cargarConcesionario();
+
         concesionario.ordenarPorMatricula();
-        gestorXML.guardarBaseDeDatos(concesionario);
+        XMLService.guardarBaseDeDatos(concesionario);
+
         System.out.println("Coches ordenados por matrícula.");
     }
 
     private void importarCSV(boolean sinDuplicados) throws DBException {
         Concesionario concesionario;
+
         if (sinDuplicados) {
             concesionario = cargarConcesionario();
-            gestorCSV.importarSinDuplicados(concesionario);
+            CSVService.importarSinDuplicados(concesionario);
         } else {
-            concesionario = gestorCSV.leerCSV();
+            concesionario = CSVService.leerCSV();
         }
-        gestorXML.guardarBaseDeDatos(concesionario);
+
+        XMLService.guardarBaseDeDatos(concesionario);
+
         System.out.println("Importación CSV completada.");
     }
 
     private void exportarConcesionarioJSON() throws DBException {
-        gestorJSON.exportarConcesionarioAJSON(cargarConcesionario());
+        JSONService.exportarConcesionarioAJSON(cargarConcesionario());
     }
 
     private void exportarCocheJSON() throws DBException {
-        String matricula = MiEntradaSalida.leerLinea("Matrícula del coche que quieres exportar: ").trim();
+        String matricula = MiEntradaSalida.leerLinea(
+                "Matrícula del coche que quieres exportar: "
+        ).trim();
+
         Coche coche = cargarConcesionario().buscarPorMatricula(matricula);
+
         if (coche == null) {
             System.out.println("No se encontró ningún coche con esa matrícula.");
             return;
         }
-        gestorJSON.exportarCocheAJSON(coche);
+
+        JSONService.exportarCocheAJSON(coche);
     }
 
     private void importarConcesionarioJSON() throws DBException {
-        importarConcesionarioDesdeJSON();
+        importacionDeJSONService.importarConcesionarioDesdeJSON(XMLService);
     }
 
     private void importarCocheJSON() throws DBException {
-        importarCocheDesdeJSON();
-    }
-
-    private void importarConcesionarioDesdeJSON() throws DBException {
-        String ruta = obtenerRutaImportacion("fichero_importar_concesionario_json");
-        try {
-            Concesionario concesionario = new ObjectMapper().readValue(new File(ruta), Concesionario.class);
-            gestorXML.guardarBaseDeDatos(concesionario);
-            System.out.println("Concesionario importado desde JSON y guardado como nueva base de datos.");
-        } catch (IOException e) {
-            throw new DBException("Error al importar concesionario desde JSON: " + e.getMessage());
-        }
-    }
-
-    private void importarCocheDesdeJSON() throws DBException {
-        String ruta = obtenerRutaImportacion("fichero_importar_coche_json");
-        try {
-            Coche coche = new ObjectMapper().readValue(new File(ruta), Coche.class);
-            Concesionario concesionario = cargarConcesionario();
-            concesionario.agregarCoche(coche);
-            gestorXML.guardarBaseDeDatos(concesionario);
-            System.out.println("Coche importado desde JSON.");
-        } catch (IOException e) {
-            throw new DBException("Error al importar coche desde JSON: " + e.getMessage());
-        }
-    }
-
-    private String obtenerRutaImportacion(String propiedad) throws DBException {
-        String ruta = PropertiesReader.get(propiedad);
-        if (ruta == null || ruta.isBlank()) {
-            throw new DBException("No se ha configurado la ruta '" + propiedad + "' en config.properties.");
-        }
-        return ruta;
+        importacionDeJSONService.importarCocheDesdeJSON(XMLService);
     }
 
     private void generarInforme() throws DBException {
-        generadorInforme.generarInforme(cargarConcesionario());
+        informesServices.generarInforme(cargarConcesionario());
     }
 }

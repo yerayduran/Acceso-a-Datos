@@ -14,11 +14,11 @@ import java.io.IOException;
  * Clase que gestiona la exportación de datos del concesionario a formato JSON
  * Usa la librería Jackson para convertir objetos Java en archivos JSON
  */
-public class GestorJSON {
+public class JSONService {
 
     private final String rutaJSON;
 
-    public GestorJSON() {
+    public JSONService() {
         this.rutaJSON = PropertiesReader.get("fichero_json");
     }
 

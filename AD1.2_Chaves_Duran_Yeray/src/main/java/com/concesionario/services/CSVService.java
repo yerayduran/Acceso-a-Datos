@@ -20,11 +20,11 @@ import java.io.IOException;
  * @config.properties ->> convertir cada línea en un objeto @Coche
  * y cargar dichos coches dentro de un @Concesionario.
  */
-public class GestorCSV {
+public class CSVService {
 
     private String rutaCSV;
 
-    public GestorCSV() {
+    public CSVService() {
         // Leer la ruta desde config.properties
         this.rutaCSV = PropertiesReader.get("fichero_importado");
 
