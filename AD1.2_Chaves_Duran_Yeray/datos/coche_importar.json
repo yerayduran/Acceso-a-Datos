@@ -1,0 +1,9 @@
+{
+  "id": 2,
+  "matricula-coche": "5679XYZ",
+  "marca": "Renault",
+  "modelo": "Clio",
+  "extras": [
+    "Techo solar"
+  ]
+}

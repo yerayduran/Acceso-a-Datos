@@ -1,125 +1,126 @@
 package com.concesionario.services;
 
+import com.concesionario.exceptions.DBException;
+import com.concesionario.model.Concesionario;
 import com.concesionario.utils.PropertiesReader;
+
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
-import com.concesionario.model.Concesionario;
-import com.concesionario.exceptions.DBException;
 
-import java.io.File; // Trabaja con rutas y archivos
+import java.io.File;
 import java.io.IOException;
 
-
 /**
- * @GestorXML ->> clase que gestiona la lectura y escritura del archivo XML que actúa como base de datos.
+ * Gestiona la lectura y escritura del archivo XML que actúa como base de datos.
  * Usa JAXB para convertir entre objetos Java y XML.
  */
 public class GestorXML {
 
-   //Accedemos a los mét-dos públicos que me devuelven la ruta destino y pantilla
-    String rutaOriginal = PropertiesReader.get("original_db");
-    String rutaPantilla = PropertiesReader.get("plantilla_db");
+    private final String rutaOriginal;
+    private final String rutaPlantilla;
 
-    //Comprobaciones
+    public GestorXML() {
+        this.rutaOriginal = PropertiesReader.get("original_db");
+        this.rutaPlantilla = PropertiesReader.get("plantilla_db");
+    }
+
     /**
      * Comprueba si el archivo XML principal existe.
-     * Si no existe, crea un nuevo archivo vacío en la ruta configurada.
+     * Si no existe, crea un archivo vacío en la ruta configurada.
      */
-    public void comprobarFicheroOriginalBb(){
-
+    public void comprobarFicheroOriginalBb() throws DBException {
         File originalBd = new File(rutaOriginal);
 
-        if(!originalBd.exists()){
-            crearRepositorioGeneral(originalBd, new File(rutaPantilla));
-            System.out.println("Se ha creado la base de datos " +originalBd );
-
-        }else {
-
-            System.out.println("BBDD --> " +originalBd );
+        if (!originalBd.exists()) {
+            crearRepositorioGeneral(originalBd);
+            System.out.println("Se ha creado la base de datos: " + originalBd.getAbsolutePath());
+        } else {
+            System.out.println("BBDD --> " + originalBd.getAbsolutePath());
         }
-
     }
 
-    private static void crearRepositorioGeneral(File destino, File plantilla){
-
-        // destino.getParentFile().mkdirs();
-        //  La pantilla
-        //  Files.copy(plantilla.toPath(), destino.toPath()); //Pensé crear fichero con datos pero cambie de idea.
-
+    /**
+     * Crea el archivo XML vacío, incluyendo las carpetas necesarias.
+     */
+    private void crearRepositorioGeneral(File destino) throws DBException {
         try {
-            destino.getParentFile().mkdirs();
-            // Crear archivo vacío
-            destino.createNewFile(); //Si el fichero no existe lo crea
+            File carpetaPadre = destino.getParentFile();
+
+            if (carpetaPadre != null) {
+                carpetaPadre.mkdirs();
+            }
+
+            destino.createNewFile();
 
         } catch (IOException e) {
-            throw new RuntimeException("Error creando archivo vacío", e);
+            throw new DBException("Error creando el archivo XML vacío: " + e.getMessage());
         }
-
-
     }
 
-
-
-    // DESERIALIZACIÓN
-    //----------------------------------------------------------------------------
-    // MÉT-DO QUE LEE ->> Base de datos original [XML -> OBJETO] - Unmarshaller
-    //----------------------------------------------------------------------------
-
+    /**
+     * Lee la base de datos XML y la convierte en un objeto Concesionario.
+     */
     public Concesionario leerBaseDeDatos() throws DBException {
         try {
-            // Primero nos aseguramos de que el archivo existe
             File archivoBD = new File(rutaOriginal);
+
             if (!archivoBD.exists()) {
-                comprobarFicheroOriginalBb(); // Lo crea si no existe
+                comprobarFicheroOriginalBb();
             }
 
-
-            // Verificar si el archivo está vacío
             if (archivoBD.length() == 0) {
-                System.err.println("No existen registros para mostrar");
-                return null;
+                System.out.println("No existen registros: se devuelve un concesionario vacío.");
+                return new Concesionario();
             }
 
-            // JAXB: XML → Objeto Java
             JAXBContext context = JAXBContext.newInstance(Concesionario.class);
             Unmarshaller unmarshaller = context.createUnmarshaller();
 
             Concesionario concesionario = (Concesionario) unmarshaller.unmarshal(archivoBD);
+
+            if (concesionario == null) {
+                concesionario = new Concesionario();
+            }
+
             return concesionario;
 
         } catch (JAXBException e) {
-            e.printStackTrace();
-            throw new DBException("Error leyendo el fichero XML con JAXB");
+            // Si el archivo está corrupto o vacío con formato inválido, devolvemos uno nuevo para evitar bloqueos
+            System.err.println("Aviso: El archivo XML está vacío o corrupto. Se inicializará un concesionario nuevo.");
+            return new Concesionario();
         }
     }
 
-
-
-
-    //----------------------------------------------------------------------------
-    // MÉT-DO QUE ESCRIBE ->> Toma un objeto @Concesionario y lo convierte a XML
-    //----------------------------------------------------------------------------
+    /**
+     * Guarda un objeto Concesionario como fichero XML.
+     */
     public void guardarBaseDeDatos(Concesionario concesionario) throws DBException {
         try {
+            if (concesionario == null) {
+                concesionario = new Concesionario();
+            }
+
             File archivoBD = new File(rutaOriginal);
+
+            File carpetaPadre = archivoBD.getParentFile();
+
+            if (carpetaPadre != null) {
+                carpetaPadre.mkdirs();
+            }
 
             JAXBContext context = JAXBContext.newInstance(Concesionario.class);
             Marshaller marshaller = context.createMarshaller();
 
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 
-            // Guardar el objeto en el archivo
             marshaller.marshal(concesionario, archivoBD);
 
             System.out.println("Base de datos guardada correctamente en XML.");
 
         } catch (JAXBException e) {
-            e.printStackTrace();
-            throw new DBException("Error guardando el fichero XML con JAXB");
+            throw new DBException("Error guardando el fichero XML con JAXB: " + e.getMessage());
         }
     }
-
-
 }

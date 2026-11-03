@@ -1,67 +1,89 @@
 package com.concesionario.services;
 
 import com.concesionario.exceptions.DBException;
-import com.concesionario.utils.PropertiesReader;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.concesionario.model.Coche;
 import com.concesionario.model.Concesionario;
-
+import com.concesionario.utils.PropertiesReader;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
 import java.io.IOException;
 
 public class GestorImportJson {
 
-    private final String rutaJSON;
+    private final String rutaImportacionConcesionario;
+    private final String rutaImportacionCoche;
 
     public GestorImportJson() {
-        this.rutaJSON = PropertiesReader.get("fichero_json");
+        this.rutaImportacionConcesionario =
+                PropertiesReader.get("fichero_importar_concesionario_json");
+
+        this.rutaImportacionCoche =
+                PropertiesReader.get("fichero_importar_coche_json");
     }
 
     /**
      * Importa un concesionario completo desde un fichero JSON
-     * y lo guarda como nueva base de datos XML
+     * y lo guarda como nueva base de datos XML.
      */
     public void importarConcesionarioDesdeJSON(GestorXML gestorXML) throws DBException {
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = crearObjectMapper();
 
         try {
-            // Lee el archivo JSON y convierte su contenido en un objeto Concesionario
-            Concesionario concesionario = mapper.readValue(new File(rutaJSON), Concesionario.class);
-            // Sobrescribe la base de datos XML con el nuevo concesionario
+            File fichero = new File(rutaImportacionConcesionario);
+            if (!fichero.exists()) {
+                throw new DBException("El fichero JSON de importación no existe en la ruta: " + rutaImportacionConcesionario);
+            }
+
+            Concesionario concesionario = mapper.readValue(fichero, Concesionario.class);
+
             gestorXML.guardarBaseDeDatos(concesionario);
-            System.out.println("Concesionario importado desde JSON y guardado como nueva base de datos");
+
+            System.out.println("Concesionario importado desde JSON y guardado como nueva base de datos.");
+
         } catch (IOException e) {
-            throw new DBException("Error al importar concesionario desde JSON: " + e.getMessage());
+            throw new DBException(
+                    "Error al importar concesionario desde JSON: " + e.getMessage()
+            );
         }
     }
 
     /**
-     * Importa un coche desde un fichero JSON y lo inserta en la base de datos actual
+     * Importa un coche desde un fichero JSON y lo inserta
+     * en la base de datos XML actual.
      */
     public void importarCocheDesdeJSON(GestorXML gestorXML) throws DBException {
-        // Creamos un objeto ObjectMapper para manejar la conversión entre JSON y objetos Java
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = crearObjectMapper();
 
         try {
-            // Lee el archivo JSON y convierte su contenido en un objeto Coche
-            Coche coche = mapper.readValue(new File(rutaJSON), Coche.class);
-
-            // Carga el concesionario actual desde el XML
-            Concesionario concesionario = gestorXML.leerBaseDeDatos();
-            if (concesionario == null) {
-                concesionario = new Concesionario();
+            File fichero = new File(rutaImportacionCoche);
+            if (!fichero.exists()) {
+                throw new DBException("El fichero JSON de coche no existe en la ruta: " + rutaImportacionCoche);
             }
-            concesionario.agregarCoche(coche);
 
-            // Guarda el XML actualizado
+            Coche coche = mapper.readValue(fichero, Coche.class);
+
+            Concesionario concesionario = gestorXML.leerBaseDeDatos();
+            concesionario.agregarCoche(coche);
             gestorXML.guardarBaseDeDatos(concesionario);
 
-            System.out.println("Coche importado desde JSON");
+            System.out.println("Coche importado desde JSON.");
+
         } catch (IOException e) {
-            throw new DBException("Error al importar coche desde JSON: " + e.getMessage());
+            throw new DBException(
+                    "Error al importar coche desde JSON: " + e.getMessage()
+            );
         }
     }
+
+    /**
+     * Crea un ObjectMapper configurado para ignorar propiedades
+     * del JSON que no existan en las clases Java.
+     */
+    private ObjectMapper crearObjectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        return mapper;
+    }
 }
-
-
