@@ -71,7 +71,7 @@ public class Coche implements Comparable<Coche>{
 
     @Override
     public int compareTo(Coche o) {
-        return 0;
+        return Double.compare(this.precio, o.precio);
     }
 
     @Override
