@@ -1,0 +1,14 @@
+Número total de coches: 5
+
+COCHES AGRUPADOS POR MARCA
+- TOYOTA:
+    • 1122QRS - Yaris
+- DWE:
+    • 1234 - edcwd
+    • 1234 - edcwd
+- SEAT:
+    • 3456JKL - Ibiza
+- PEUGEOT:
+    • 7890MNP - 208
+
+Extra más repetido: Llantas de aleación

@@ -3,31 +3,24 @@ package com.concesionario.model;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Coche implements Comparable<Coche>{
+public class Coche {
 
-    private int id;
     private String matricula;
     private String marca;
     private String modelo;
     private List<String> extras;
     private double precio;
+    private Integer idPropietario;
 
-    public Coche(int id, String matricula, String marca, String modelo, List<String> extras, double precio) {
-        this.id = id;
+    public Coche(String matricula, String marca, String modelo, List<String> extras, double precio, Integer idPropietario) {
         this.matricula = matricula;
         this.marca = marca;
         this.modelo = modelo;
         this.extras = new ArrayList<>();
         this.precio = precio;
+        this.idPropietario = idPropietario;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 
     public String getMatricula() {
         return matricula;
@@ -57,7 +50,7 @@ public class Coche implements Comparable<Coche>{
         return extras;
     }
 
-    public void setExtras(List<String> extras) {
+    public void setExtras(ArrayList<String> extras) {
         this.extras = extras;
     }
 
@@ -69,20 +62,19 @@ public class Coche implements Comparable<Coche>{
         this.precio = precio;
     }
 
-    @Override
-    public int compareTo(Coche o) {
-        return Double.compare(this.precio, o.precio);
+    public Integer getIdPropietario() {
+        return idPropietario;
     }
 
     @Override
     public String toString() {
         return "Coche{" +
-                "id=" + id +
-                ", matricula='" + matricula + '\'' +
+                "matricula='" + matricula + '\'' +
                 ", marca='" + marca + '\'' +
                 ", modelo='" + modelo + '\'' +
                 ", extras=" + extras +
                 ", precio=" + precio +
+                ", idPropietario=" + idPropietario +
                 '}';
     }
 }
