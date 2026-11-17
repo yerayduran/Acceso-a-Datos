@@ -44,7 +44,7 @@ public class Main {
                 + (conexionProbada ? " [CONECTADO]" : " [SIN PROBAR]"));
         System.out.println("-------------------------------------------------------");
         System.out.println(" 1. Conectar BBDD (Elegir y probar MySQL o SQLite)");
-        System.out.println(" 2. Inicializar/Crear Tablas");
+        System.out.println(" 2. Crear Tablas");
         System.out.println(" 3. Registrar Propietario");
         System.out.println(" 4. Insertar Coche (Stock Concesionario)");
         System.out.println(" 5. Importar Coches (CSV transaccional)");
