@@ -16,8 +16,7 @@ public class Coche {
         this.matricula = matricula;
         this.marca = marca;
         this.modelo = modelo;
-        this.extras = new ArrayList<>();
-        this.precio = precio;
+        this.extras = (extras != null) ? extras : new ArrayList<>();        this.precio = precio;
         this.idPropietario = idPropietario;
     }
 
@@ -69,12 +68,12 @@ public class Coche {
     @Override
     public String toString() {
         return "Coche{" +
-                "matricula='" + matricula + '\'' +
+                "matrícula='" + matricula + '\'' +
                 ", marca='" + marca + '\'' +
                 ", modelo='" + modelo + '\'' +
                 ", extras=" + extras +
-                ", precio=" + precio +
-                ", idPropietario=" + idPropietario +
+                ", precio=" + precio + "€" +
+                ", idPropietario=" + (idPropietario != null ? idPropietario : "En Concesionario") +
                 '}';
     }
 }

@@ -313,13 +313,18 @@ public class ConcesionarioServices {
 
     /**
      * Método auxiliar para construir un objeto Coche desde un ResultSet.
+     * Soporta separación por comas ',' y por barras verticales '|' (CSV).
      */
     private Coche mapearCoche(ResultSet rs) throws SQLException {
         String extrasRaw = rs.getString("extras");
         List<String> extras = new ArrayList<>();
         if (extrasRaw != null && !extrasRaw.isBlank()) {
-            for (String item : extrasRaw.split(",")) {
-                extras.add(item.trim());
+            // Separa tanto por comas ',' como por barras verticales '|'
+            for (String item : extrasRaw.split("[,|]")) {
+                String extraLimpio = item.trim();
+                if (!extraLimpio.isEmpty() && !extraLimpio.equals("-")) {
+                    extras.add(extraLimpio);
+                }
             }
         }
         int idProp = rs.getInt("id_propietario");
