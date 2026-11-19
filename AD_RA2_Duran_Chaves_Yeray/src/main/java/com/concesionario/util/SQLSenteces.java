@@ -77,11 +77,6 @@ public class SQLSenteces {
             from coches c
             where c.id_propietario is NULL;""";
     // Consulta, muestra un listado de los coches que tienen propietarios
-    public static final String SQL_COCHES_CON_PROPIETARIO = """
-            select *
-            from coches c
-            where c.id_propietario is NOT NULL;""";
-    // Consulta, muestra un listado de los coches que tienen propietarios
     public static final String SQL_COCHES_CON_PROPIETARIO_JOIN = """
         select c.matricula, c.marca, c.modelo, c.extras, c.precio, c.id_propietario, p.dni
         from coches c

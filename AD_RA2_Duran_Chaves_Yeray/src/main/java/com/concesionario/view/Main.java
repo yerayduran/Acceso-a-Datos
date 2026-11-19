@@ -228,7 +228,7 @@ public class Main {
         }
     }
 
-    private static void opcionGenerarInforme() throws ConcesionarioException, IOException {
+    private static void opcionGenerarInforme() throws ConcesionarioException {
         try {
             String ruta = informesService.generarInformeResumen(service);
             System.out.println("Informe generado correctamente en: " + ruta);
